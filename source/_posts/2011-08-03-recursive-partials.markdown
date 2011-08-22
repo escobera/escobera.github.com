@@ -6,7 +6,7 @@ tags: [ruby, rails, view]
 
 Yesterday I needed to show a deep nested tree in a view. The first solution that crossed my mind was something along the lines of a recursive helper like this one.
 
-{% codeblock [language:ruby] %}
+{% codeblock lang:ruby %}
 def display_tree_recursive(tree, parent_id)
   ret = "<ul>"
   tree.each do |node|
@@ -23,7 +23,7 @@ end
 That's ok for simple ul-li pairs but I needed much more markup since my task was to show this information as nested accordions. Wouldn't it be better if I could define a partial and call it from inside itself passing the children as its `locals` variables? Guess what? It works just like that! =)
 
 In the index view
-{% codeblock [language:erb] %}
+{% codeblock lang:erb %}
 <ul class="accordion">
     <% @sections.each do |section| %>
       <li>
@@ -39,7 +39,7 @@ In the index view
 {% endcodeblock %}
 
 That `section/section_children` partial is the trick. Inside it we have
-{% codeblock [language:erb] %}
+{% codeblock lang:erb %}
 <% section.children.each do |child| %>
   <li>
     <h3 ><a href="#" class="header"><%= child.name %></a></h3>
