@@ -19,7 +19,7 @@ def display_tree_recursive(tree, parent_id)
   end
   ret += "</ul>"
 end
-{% codeblock %}
+{% endcodeblock %}
 That's ok for simple ul-li pairs but I needed much more markup since my task was to show this information as nested accordions. Wouldn't it be better if I could define a partial and call it from inside itself passing the children as its `locals` variables? Guess what? It works just like that! =)
 
 In the index view
@@ -36,7 +36,7 @@ In the index view
       </li>
     <% end %>
   </ul>
-{% codeblock %}
+{% endcodeblock %}
 
 That `section/section_children` partial is the trick. Inside it we have
 {% codeblock [language:erb] %}
@@ -50,7 +50,7 @@ That `section/section_children` partial is the trick. Inside it we have
       </div>
   </li>
 <% end %>
-{% codeblock %}
+{% endcodeblock %}
 
 and that's it!
 
