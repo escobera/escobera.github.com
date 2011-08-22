@@ -1,0 +1,7 @@
+---
+layout: post
+title: Starting things up
+tags: [about]
+---
+
+Time to start sharing whatever knowledge comes my way! This will be the first post on this blog and I hope many will follow. I'll mainly talk about Rails and its fellas, so if that's your thing stick around!
