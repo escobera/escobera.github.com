@@ -2,10 +2,10 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+url: http://escobera.github.com
+title: act_as_newbie
+subtitle: Keeping a newbie mindset, at all times.
+author: Rafael Barbosa
 simple_search: http://google.com/search
 
 # RSS / Email (optional) subscription links (change if using something like Feedburner)
@@ -49,7 +49,7 @@ default_asides: [asides/recent_posts.html, asides/twitter.html, asides/delicious
 # ----------------------- #
 
 # Twitter
-twitter_user:
+twitter_user: rafaelescobar
 twitter_tweet_count: 4
 twitter_show_replies: false
 twitter_follow_button: true
