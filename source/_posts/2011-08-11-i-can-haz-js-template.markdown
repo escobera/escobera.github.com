@@ -6,7 +6,7 @@ tags: [javascript, view]
 
 The [ICanHaz](http://icanhazjs.com/) javascript templating system is just awesome. It is really simple, and powerful, BUT as all good things in life it's not perfect! ICanHaz is built on top of [moustache.js](https://github.com/janl/mustache.js) that, on his part, is a javascript implementation of the moustache templates. Originally the moustache implementation didn't support dot notation for accessing nested objects. Like for instance
 
-``` javascript
+{% codeblock lang:javascript %}
     var post = {
       title : "Post title",
       body : "post body",
@@ -15,7 +15,7 @@ The [ICanHaz](http://icanhazjs.com/) javascript templating system is just awesom
         age : 26
       } 
     };
-```
+{% endcodeblock %}
 
 Normally you can access the author's name in my js files via dot notation like <code>post.author.name</code>, but until [this commit](https://github.com/defunkt/mustache/commit/c183699ff1b23b4bc5efbfa3ed323ff9509855f7) this wasn't possible within moustache's templates and it still isn't supported by the javascript implementation. So how can I access nested objects? The same way you iterate over arrays!
 
