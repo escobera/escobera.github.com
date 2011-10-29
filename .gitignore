@@ -1,7 +1,9 @@
 .bundle
 .DS_Store
 .sass-cache
+_sass-cache
 .gist-cache
+_gist-cache
 .pygments-cache
 _deploy
 public

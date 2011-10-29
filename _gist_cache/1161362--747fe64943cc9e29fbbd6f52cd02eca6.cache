@@ -1,5 +1,0 @@
-<div class="post">
-  <h3>{{ title }}</h3>
-  <div>{{ body }}</div>
-  <div>A post by {{ #author }}{{ name }}{{author}}</div>
-</div>
