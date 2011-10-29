@@ -2,6 +2,7 @@
 layout: post
 title: "Client_side_validations and Dynamic Nested Forms"
 date: 2011-08-22 20:59
+comments: true
 categories: [rails, view, gem, javascript]
 ---
 
