@@ -4,11 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  {% if page.force_title %}
-    <title>{{page.force_title}}</title>
-  {% else %}
-    <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
-  {% endif %}  
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
   <meta name="author" content="{{ site.author }}">
 
   {% capture description %}{% if page.description %}{{ page.description }}{% else %}{{ content | raw_content }}{% endif %}{% endcapture %}
