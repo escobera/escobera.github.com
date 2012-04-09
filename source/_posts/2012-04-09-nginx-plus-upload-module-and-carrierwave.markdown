@@ -23,4 +23,24 @@ As soon as you try to upload anything nginx will complain about permissions or d
 
 Now back to your app.
 
+{% codeblock lang:ruby %}
+def upload
+  @track = @album.tracks.build(params[:track])
 
+  # Production/staging only, development will go the carrierwave way.
+  if Rails.env != "development"
+    @track.raw_file = ActionDispatch::Http::UploadedFile.new(
+      filename: params['track']['raw_file']['original_filename'],
+      tempfile: File.open(params['track']['raw_file']['path'])
+    )
+    @track.name = params['track']['raw_file']['original_filename'].chomp(".wav")
+  else
+    @track.name = params['track']['raw_file'].original_filename.chomp(".wav")
+  end
+
+  @track.save!
+  render :json => @track
+end
+{% endcodeblock %}
+
+The trick here is simulate a ActionDispatch::Http::UploadedFile being passed to carrierwave.
