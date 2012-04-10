@@ -76,8 +76,22 @@ mkdir 0 1 2 3 4 5 6 7 8 9
 sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp
 {% endcodeblock %}
 
-Now back to your rails app. Lets create the route to recieve the request after the upload is handled by nginx.
+Now to your rails app. I'm using mongoid, but this applies to any orm.
+{% codeblock video.rb %}
+class Video
+  include Mongoid::Document
 
+  # ...
+
+  field :raw_file, :type => String
+  mount_uploader :raw_file, VideoUploader
+
+  # ...
+
+end
+{% endcodeblock %}
+
+Lets create the route to recieve the request after the upload is handled by nginx.
 {% codeblock routes.rb %}
   match "/videos/upload/", as: "upload_videos", controller: "videos", action: "upload", via: :post
 {% endcodeblock %}
