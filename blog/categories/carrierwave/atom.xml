@@ -4,7 +4,7 @@
   <title><![CDATA[Category: carrierwave | act_as_newbie]]></title>
   <link href="http://act-as-newbie.com/blog/categories/carrierwave/atom.xml" rel="self"/>
   <link href="http://act-as-newbie.com/"/>
-  <updated>2012-04-09T21:12:42-03:00</updated>
+  <updated>2012-04-09T21:18:57-03:00</updated>
   <id>http://act-as-newbie.com/</id>
   <author>
     <name><![CDATA[Rafael Barbosa]]></name>
@@ -125,8 +125,8 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>cd /web_apps/mysite/shared/uploads/tmp
-</span><span class='line'>  mkdir 0 1 2 3 4 5 6 7 8 9
-</span><span class='line'>  sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span><span class='line'>mkdir 0 1 2 3 4 5 6 7 8 9
+</span><span class='line'>sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Now back to your rails app. Lets create the route to recieve the request after the upload is handled by nginx.</p>
 
@@ -186,7 +186,7 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 </span><span class='line'><span class="sr">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>The trick here is simulate a ActionDispatch::Http::UploadedFile being passed to carrierwave.</p>
+<p>The trick here is to simulate a <code>ActionDispatch::Http::UploadedFile</code> being passed to carrierwave.</p>
 
 <p>This will send the file to the right place, but I still have some quirks to solve. Like the temporary dir cleanup task and the content_type validation. Once I get the hang of those I'll update this post.</p>
 ]]></content>
