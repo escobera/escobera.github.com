@@ -71,9 +71,9 @@ As soon as you try to upload anything nginx will complain about permissions or d
 I'm using 1 level deep directory hashing (set on `upload store`) so I'll have to manually create the directory structure and chown it to the user that runs nginx workers (in my case is rafa:rafa).
 
 {% codeblock %}
-  cd /web_apps/mysite/shared/uploads/tmp
-  mkdir 0 1 2 3 4 5 6 7 8 9
-  sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp
+cd /web_apps/mysite/shared/uploads/tmp
+mkdir 0 1 2 3 4 5 6 7 8 9
+sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp
 {% endcodeblock %}
 
 Now back to your rails app. Lets create the route to recieve the request after the upload is handled by nginx.
@@ -104,6 +104,6 @@ def upload
 end
 {% endcodeblock %}
 
-The trick here is simulate a ActionDispatch::Http::UploadedFile being passed to carrierwave.
+The trick here is to simulate a `ActionDispatch::Http::UploadedFile` being passed to carrierwave.
 
 This will send the file to the right place, but I still have some quirks to solve. Like the temporary dir cleanup task and the content_type validation. Once I get the hang of those I'll update this post.
