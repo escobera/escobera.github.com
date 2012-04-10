@@ -209,7 +209,35 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 </span><span class='line'>sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now back to your rails app. Lets create the route to recieve the request after the upload is handled by nginx.</p>
+<p>Now to your rails app. I&#8217;m using mongoid, but this applies to any orm.</p>
+
+<figure class='code'><figcaption><span>video.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">class</span> <span class="nc">Video</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Mongoid</span><span class="o">::</span><span class="no">Document</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># ...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">field</span> <span class="ss">:raw_file</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="nb">String</span>
+</span><span class='line'>  <span class="n">mount_uploader</span> <span class="ss">:raw_file</span><span class="p">,</span> <span class="no">VideoUploader</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lets create the route to recieve the request after the upload is handled by nginx.</p>
 
 <figure class='code'><figcaption><span>routes.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
