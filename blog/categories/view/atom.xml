@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: view | act_as_newbie]]></title>
+  <link href="http://act-as-newbie.com/blog/categories/view/atom.xml" rel="self"/>
+  <link href="http://act-as-newbie.com/"/>
+  <updated>2012-04-09T21:12:42-03:00</updated>
+  <id>http://act-as-newbie.com/</id>
+  <author>
+    <name><![CDATA[Rafael Barbosa]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Client_side_validations and Dynamic Nested Forms]]></title>
+    <link href="http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/"/>
+    <updated>2011-08-22T20:59:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms</id>
+    <content type="html"><![CDATA[<p>Last week I found a little caveat when using the <a href="https://github.com/bcardarella/client_side_validations">client_side_validations</a> gem with ajax-loaded forms. It didn't work out of the box.</p>
+
+<p>Digging through the sourcecode I found this comment</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>rails.validations.js </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'>  <span class="c1">// Main hook</span>
+</span><span class='line'>  <span class="c1">// If new forms are dynamically introduced into the DOM the .validate() method</span>
+</span><span class='line'>  <span class="c1">// must be invoked on that form</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form[data-validate]&#39;</span><span class="p">).</span><span class="nx">validate</span><span class="p">();</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Ok, so I called <code>$("#my-form").validate()</code> on <code>ajax:success</code> and everything was fine! <em>Except it wasn't =/</em></p>
+
+<p>The behavior I understood, after banging my head against the wall several times was: if the form was entirely rendered in my ajax call it would validate ok, but if I added some fields inside it dynamically then I'd start getting those nasty <code>validators is not defined</code> errors and everything would go boom!</p>
+
+<p>So how do I add some fields to the form and keep them "validatable"?
+<a href="https://github.com/bcardarella/client_side_validations/issues/149">this issue</a> gave me some insight. And after rummaging the code a little more I found that this gem registers the validators in the <code>window</code> object. This process is done inside the form renderer, and that's why the full rendered forms worked and adding just some of the fields did not. To accomplish that I created this helper</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">add_dynamic_validators</span><span class="p">(</span><span class="n">builders</span><span class="p">)</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;pre&gt;&lt;code&gt;result = &quot;&quot;</span>
+</span><span class='line'><span class="sr">builders.each do |builder|</span>
+</span><span class='line'><span class="sr">  builder.object.client_side_validation_hash.each do |validator|</span>
+</span><span class='line'><span class="sr">    result += &quot;window[form_id].validators[&#39;</span><span class="si">#{</span><span class="n">builder</span><span class="o">.</span><span class="n">object_name</span><span class="si">}</span><span class="sr">[</span><span class="si">#{</span><span class="n">validator</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="si">}</span><span class="sr">]&#39;] = </span><span class="si">#{</span><span class="n">validator</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_json</span><span class="si">}</span><span class="sr">;\n&quot;</span>
+</span><span class='line'><span class="sr">  end</span>
+</span><span class='line'><span class="sr">end</span>
+</span><span class='line'><span class="sr">result.html_safe</span>
+</span><span class='line'><span class="sr">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;</span><span class="sr">/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">&lt;p&gt;  end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>It recieves an array of form builders and inspect it for the validators added by the gem. Then it prints the resulting instruction within the form partial, inside a function, to which I pass the id of the form that I want to validate.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">function</span> <span class="nx">update_dynamic_fields</span><span class="p">(</span><span class="nx">form_id</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="o">%=</span> <span class="nx">add_dynamic_validators</span> <span class="nx">builders</span> <span class="o">%&amp;</span><span class="nx">gt</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Then after the fields (with the script block) were added the to form you can call</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">var</span> <span class="nx">$form</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#my-form&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">update_dynamic_fields</span><span class="p">(</span><span class="nx">$form</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>I know this is hacky as hell, but with this I was able to keep using this gem even inside pages with lots of moving parts.</p>
+]]></content>
+  </entry>
+  
+</feed>

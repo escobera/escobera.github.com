@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://act-as-newbie.com/blog/2011/08/02/a-start/</loc>
+        <lastmod>2012-04-09T19:52:20-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://act-as-newbie.com/blog/2011/08/03/recursive-partials/</loc>
+        <lastmod>2012-04-09T19:52:20-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://act-as-newbie.com/blog/2011/08/11/i-can-haz-js-template/</loc>
+        <lastmod>2012-04-09T19:52:20-03:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/
+        </loc>
+        <lastmod>2012-04-09T19:52:20-03:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/
+        </loc>
+        <lastmod>2012-04-09T21:11:02-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://act-as-newbie.com/blog/archives/</loc>
+        <lastmod>2012-04-09T21:11:02-03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://act-as-newbie.com/</loc>
+        <lastmod>2012-04-09T21:11:02-03:00</lastmod>
+    </url>
+</urlset>

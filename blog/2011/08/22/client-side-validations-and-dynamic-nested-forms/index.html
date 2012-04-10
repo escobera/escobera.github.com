@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Client_side_validations and Dynamic Nested Forms - act_as_newbie</title>
+  <meta name="author" content="Rafael Barbosa">
+
+  
+  <meta name="description" content="Last week I found a little caveat when using the client_side_validations gem with ajax-loaded forms. It didn&#8217;t work out of the box. Digging &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/act-as-newbie" rel="alternate" title="act_as_newbie" type="application/atom+xml">
+  <!--Fonts from Google's Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-4336559-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">act_as_newbie</a></h1>
+  
+    <h2>Keeping a newbie mindset, at all times.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/act-as-newbie" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:act-as-newbie.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul role=main-navigation>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Client_side_validations and Dynamic Nested Forms</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2011-08-22T20:59:00-03:00" pubdate>Aug 22<span>nd</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Last week I found a little caveat when using the <a href="https://github.com/bcardarella/client_side_validations">client_side_validations</a> gem with ajax-loaded forms. It didn&#8217;t work out of the box.</p>
+
+<p>Digging through the sourcecode I found this comment</p>
+
+<figure class='code'><figcaption><span>rails.validations.js </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'>  <span class="c1">// Main hook</span>
+</span><span class='line'>  <span class="c1">// If new forms are dynamically introduced into the DOM the .validate() method</span>
+</span><span class='line'>  <span class="c1">// must be invoked on that form</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form[data-validate]&#39;</span><span class="p">).</span><span class="nx">validate</span><span class="p">();</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok, so I called <code>$("#my-form").validate()</code> on <code>ajax:success</code> and everything was fine! <em>Except it wasn&#8217;t =/</em></p>
+
+<p>The behavior I understood, after banging my head against the wall several times was: if the form was entirely rendered in my ajax call it would validate ok, but if I added some fields inside it dynamically then I&#8217;d start getting those nasty <code>validators is not defined</code> errors and everything would go boom!</p>
+
+<p>So how do I add some fields to the form and keep them &#8220;validatable&#8221;?
+<a href="https://github.com/bcardarella/client_side_validations/issues/149">this issue</a> gave me some insight. And after rummaging the code a little more I found that this gem registers the validators in the <code>window</code> object. This process is done inside the form renderer, and that&#8217;s why the full rendered forms worked and adding just some of the fields did not. To accomplish that I created this helper</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">add_dynamic_validators</span><span class="p">(</span><span class="n">builders</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>    <span class="n">builders</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">builder</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">builder</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">client_side_validation_hash</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">validator</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">result</span> <span class="o">+=</span> <span class="s2">&quot;window[form_id].validators[&#39;</span><span class="si">#{</span><span class="n">builder</span><span class="o">.</span><span class="n">object_name</span><span class="si">}</span><span class="s2">[</span><span class="si">#{</span><span class="n">validator</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="si">}</span><span class="s2">]&#39;] = </span><span class="si">#{</span><span class="n">validator</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">to_json</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="n">result</span><span class="o">.</span><span class="n">html_safe</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It recieves an array of form builders and inspect it for the validators added by the gem. Then it prints the resulting instruction within the form partial, inside a function, to which I pass the id of the form that I want to validate.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">function</span> <span class="nx">update_dynamic_fields</span><span class="p">(</span><span class="nx">form_id</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>    <span class="o">&lt;%=</span> <span class="nx">add_dynamic_validators</span> <span class="nx">builders</span> <span class="o">%&gt;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then after the fields (with the script block) were added the to form you can call</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">var</span> <span class="nx">$form</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#my-form&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">update_dynamic_fields</span><span class="p">(</span><span class="nx">$form</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I know this is hacky as hell, but with this I was able to keep using this gem even inside pages with lots of moving parts.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafael Barbosa</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2011-08-22T20:59:00-03:00" pubdate>Aug 22<span>nd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/view/'>view</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/" data-via="rafaelescobar" data-counturl="http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/08/11/i-can-haz-js-template/" title="Previous Post: ICanHaz templates - Dealing with the lack of dot notation">&laquo; ICanHaz templates - Dealing with the lack of dot notation</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/" title="next Post: Nginx + Upload Module and Carrierwave">Nginx + Upload Module and Carrierwave &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    Liquid error: invalid byte sequence in US-ASCII
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Rafael Barbosa -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'act-as-newbie';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/';
+        var disqus_url = 'http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/';;
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

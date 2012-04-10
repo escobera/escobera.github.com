@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Nginx + Upload Module and Carrierwave - act_as_newbie</title>
+  <meta name="author" content="Rafael Barbosa">
+
+  
+  <meta name="description" content="Last night was a really long one. Why? Because I couldn&#8217;t find enough information on how to make nginx handle uploads (using upload module and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="http://feeds.feedburner.com/act-as-newbie" rel="alternate" title="act_as_newbie" type="application/atom+xml">
+  <!--Fonts from Google's Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-4336559-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">act_as_newbie</a></h1>
+  
+    <h2>Keeping a newbie mindset, at all times.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://feeds.feedburner.com/act-as-newbie" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:act-as-newbie.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+<ul role=main-navigation>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Nginx + Upload Module and Carrierwave</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+  
+
+<time datetime="2012-04-09T11:15:00-03:00" pubdate>Apr 9<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Last night was a really long one. Why? Because I couldn&#8217;t find enough information on how to make nginx handle uploads (using upload module and upload progress) and include carrierwave on the equation to handle files after they have been sent to the server.</p>
+
+<p>Maybe I didn&#8217;t search enough, maybe I found only the old deprecated stuff, but after compiling <a href="http://fernando.blat.es/post/11106552363/nginx-upload-module-rails-carrierwave">these</a> <a href="http://blog.joshsoftware.com/2010/10/20/uploading-multiple-files-with-nginx-upload-module-and-upload-progress-bar/">sources</a> I think I came up with a decent solution.</p>
+
+<p>First off, let&#8217;s compile nginx with some upload sugar.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> /tmp
+</span><span class='line'>
+</span><span class='line'>wget http://nginx.org/download/nginx-1.1.14.tar.gz
+</span><span class='line'>tar -zxvf nginx-1.0.14.tar.gz
+</span><span class='line'>
+</span><span class='line'>wget http://www.grid.net.ru/nginx/download/nginx_upload_module-2.2.0.tar.gz
+</span><span class='line'>tar -zxvf nginx_upload_module-2.2.0.tar.gz
+</span><span class='line'>
+</span><span class='line'><span class="nb">cd </span>nginx-1.0.14
+</span><span class='line'>./configure --prefix<span class="o">=</span>/usr/local/nginx-1.1.14 --with-http_ssl_module --with-http_gzip_static_module --conf-path<span class="o">=</span>/etc/nginx/nginx.conf --add-module<span class="o">=</span>../nginx_upload_module-2.2.0/
+</span><span class='line'>make
+</span><span class='line'>sudo make install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So the module is there, we need to make it come to life in <code>nginx.conf</code></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='nginx'><span class='line'><span class="k">http</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1"># ... A lot of stuff</span>
+</span><span class='line'>  <span class="kn">server</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># This will be our route on our rails app</span>
+</span><span class='line'>    <span class="kn">location</span> <span class="s">/videos/upload</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1"># app_server is the unicorn upstream</span>
+</span><span class='line'>      <span class="kn">proxy_pass</span> <span class="s">http://app_server</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1"># @app is the unicorn upstream proxy location</span>
+</span><span class='line'>      <span class="kn">upload_pass</span> <span class="s">@app</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="kn">upload_store</span> <span class="s">/web_apps/mysite/shared/uploads/tmp</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="c1"># set permissions on the uploaded files</span>
+</span><span class='line'>      <span class="kn">upload_store_access</span> <span class="s">user:rw</span> <span class="s">group:rw</span> <span class="s">all:r</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1"># Set specified fields in request body</span>
+</span><span class='line'>      <span class="kn">upload_set_form_field</span> <span class="nv">$upload_field_name[original_filename]</span> <span class="s">&quot;</span><span class="nv">$upload_file_name&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="kn">upload_set_form_field</span> <span class="nv">$upload_field_name[content_type]</span> <span class="s">&quot;</span><span class="nv">$upload_content_type&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="kn">upload_set_form_field</span> <span class="nv">$upload_field_name[path]</span> <span class="s">&quot;</span><span class="nv">$upload_tmp_path&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="kn">upload_pass_form_field</span> <span class="s">&quot;^X-Progress-ID</span><span class="nv">$|^authenticity_token$&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="kn">upload_cleanup</span> <span class="mi">400</span> <span class="mi">404</span> <span class="mi">499</span> <span class="mi">500</span><span class="s">-505</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is from a server using unicorn to serve the rails app, if you need some help getting started with nginx and unicorn <a href="http://tomkersten.com/articles/nginx-unicorn-rvm-server-setup/">this</a> is a good place to start. And I really recommend that you read <a href="http://www.grid.net.ru/nginx/upload.en.html">upload module&#8217;s docs</a> carefully.</p>
+
+<p>The important bits are the ones starting with &#8220;upload&#8221;.
+The way it works is <code>upload_pass</code> routes the request to the <code>@app</code> location after the upload has finished it&#8217;ll pass the form fields you set with <code>upload_pass_form_field</code> along with the ones we&#8217;ll be using to show the file to carrierwave.</p>
+
+<p>Now restart nginx and you&#8217;re good to go. #NOT</p>
+
+<p>As soon as you try to upload anything nginx will complain about permissions or directories it could not found so lets fix that.</p>
+
+<p>I&#8217;m using 1 level deep directory hashing (set on <code>upload store</code>) so I&#8217;ll have to manually create the directory structure and chown it to the user that runs nginx workers (in my case is rafa:rafa).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /web_apps/mysite/shared/uploads/tmp
+</span><span class='line'>  mkdir 0 1 2 3 4 5 6 7 8 9
+</span><span class='line'>  sudo chown -R rafa:rafa /web_apps/mysite/shared/uploads/tmp</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now back to your rails app. Lets create the route to recieve the request after the upload is handled by nginx.</p>
+
+<figure class='code'><figcaption><span>routes.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'>  <span class="n">match</span> <span class="s2">&quot;/videos/upload/&quot;</span><span class="p">,</span> <span class="n">as</span><span class="p">:</span> <span class="s2">&quot;upload_videos&quot;</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="s2">&quot;videos&quot;</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="s2">&quot;upload&quot;</span><span class="p">,</span> <span class="n">via</span><span class="p">:</span> <span class="ss">:post</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the action to save it.</p>
+
+<figure class='code'><figcaption><span>videos_controller.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='rb'><span class='line'><span class="k">def</span> <span class="nf">upload</span>
+</span><span class='line'>  <span class="vi">@video</span> <span class="o">=</span> <span class="no">Video</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:video</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># Production/staging only, development will go the carrierwave way.</span>
+</span><span class='line'>  <span class="k">if</span> <span class="no">Rails</span><span class="o">.</span><span class="n">env</span> <span class="o">!=</span> <span class="s2">&quot;development&quot;</span>
+</span><span class='line'>    <span class="vi">@video</span><span class="o">.</span><span class="n">raw_file</span> <span class="o">=</span> <span class="no">ActionDispatch</span><span class="o">::</span><span class="no">Http</span><span class="o">::</span><span class="no">UploadedFile</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="n">filename</span><span class="p">:</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;video&#39;</span><span class="o">][</span><span class="s1">&#39;raw_file&#39;</span><span class="o">][</span><span class="s1">&#39;original_filename&#39;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">tempfile</span><span class="p">:</span> <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="s1">&#39;video&#39;</span><span class="o">][</span><span class="s1">&#39;raw_file&#39;</span><span class="o">][</span><span class="s1">&#39;path&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>    <span class="vi">@video</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;video&#39;</span><span class="o">][</span><span class="s1">&#39;raw_file&#39;</span><span class="o">][</span><span class="s1">&#39;original_filename&#39;</span><span class="o">].</span><span class="n">chomp</span><span class="p">(</span><span class="s2">&quot;.raw&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="vi">@video</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;video&#39;</span><span class="o">][</span><span class="s1">&#39;raw_file&#39;</span><span class="o">].</span><span class="n">original_filename</span><span class="o">.</span><span class="n">chomp</span><span class="p">(</span><span class="s2">&quot;.raw&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="vi">@video</span><span class="o">.</span><span class="n">save!</span>
+</span><span class='line'>  <span class="n">render</span> <span class="ss">:json</span> <span class="o">=&gt;</span> <span class="vi">@video</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The trick here is simulate a ActionDispatch::Http::UploadedFile being passed to carrierwave.</p>
+
+<p>This will send the file to the right place, but I still have some quirks to solve. Like the temporary dir cleanup task and the content_type validation. Once I get the hang of those I&#8217;ll update this post.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rafael Barbosa</span></span>
+
+      
+
+
+
+
+  
+
+<time datetime="2012-04-09T11:15:00-03:00" pubdate>Apr 9<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/carrierwave/'>carrierwave</a>, <a class='category' href='/blog/categories/nginx/'>nginx</a>, <a class='category' href='/blog/categories/rails/'>rails</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/" data-via="rafaelescobar" data-counturl="http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/" title="Previous Post: Client_side_validations and Dynamic Nested Forms">&laquo; Client_side_validations and Dynamic Nested Forms</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    Liquid error: invalid byte sequence in US-ASCII
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Rafael Barbosa -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'act-as-newbie';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/';
+        var disqus_url = 'http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/';;
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

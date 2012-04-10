@@ -1,106 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>act_as_newbie</title>
-  <meta name="author" content="Rafael Barbosa">
-
-  
-  <meta name="description" content="Last night was a really long one. Why? Because I couldn&#8217;t find enough information on how to make nginx handle uploads (using upload module and &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://act-as-newbie.com">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="http://feeds.feedburner.com/act-as-newbie" rel="alternate" title="act_as_newbie" type="application/atom+xml">
-  <!--Fonts from Google's Web font directory at http://google.com/webfonts -->
-<link href='http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css'>
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-4336559-2']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">act_as_newbie</a></h1>
-  
-    <h2>Keeping a newbie mindset, at all times.</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="http://feeds.feedburner.com/act-as-newbie" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:act-as-newbie.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-<ul role=main-navigation>
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[act_as_newbie]]></title>
+  <link href="http://act-as-newbie.com/atom.xml" rel="self"/>
+  <link href="http://act-as-newbie.com/"/>
+  <updated>2012-04-09T21:12:42-03:00</updated>
+  <id>http://act-as-newbie.com/</id>
+  <author>
+    <name><![CDATA[Rafael Barbosa]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/">Nginx + Upload Module and Carrierwave</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-
-<time datetime="2012-04-09T11:15:00-03:00" pubdate>Apr 9<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last night was a really long one. Why? Because I couldn&#8217;t find enough information on how to make nginx handle uploads (using upload module and upload progress) and include carrierwave on the equation to handle files after they have been sent to the server.</p>
+  <entry>
+    <title type="html"><![CDATA[Nginx + Upload Module and Carrierwave]]></title>
+    <link href="http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave/"/>
+    <updated>2012-04-09T11:15:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2012/04/09/nginx-plus-upload-module-and-carrierwave</id>
+    <content type="html"><![CDATA[<p>Last night was a really long one. Why? Because I couldn&#8217;t find enough information on how to make nginx handle uploads (using upload module and upload progress) and include carrierwave on the equation to handle files after they have been sent to the server.</p>
 
 <p>Maybe I didn&#8217;t search enough, maybe I found only the old deprecated stuff, but after compiling <a href="http://fernando.blat.es/post/11106552363/nginx-upload-module-rails-carrierwave">these</a> <a href="http://blog.joshsoftware.com/2010/10/20/uploading-multiple-files-with-nginx-upload-module-and-upload-progress-bar/">sources</a> I think I came up with a decent solution.</p>
 
@@ -260,39 +178,15 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 <p>The trick here is simulate a ActionDispatch::Http::UploadedFile being passed to carrierwave.</p>
 
 <p>This will send the file to the right place, but I still have some quirks to solve. Like the temporary dir cleanup task and the content_type validation. Once I get the hang of those I&#8217;ll update this post.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/">Client_side_validations and Dynamic Nested Forms</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-08-22T20:59:00-03:00" pubdate>Aug 22<span>nd</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last week I found a little caveat when using the <a href="https://github.com/bcardarella/client_side_validations">client_side_validations</a> gem with ajax-loaded forms. It didn&#8217;t work out of the box.</p>
+  <entry>
+    <title type="html"><![CDATA[Client_side_validations and Dynamic Nested Forms]]></title>
+    <link href="http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms/"/>
+    <updated>2011-08-22T20:59:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2011/08/22/client-side-validations-and-dynamic-nested-forms</id>
+    <content type="html"><![CDATA[<p>Last week I found a little caveat when using the <a href="https://github.com/bcardarella/client_side_validations">client_side_validations</a> gem with ajax-loaded forms. It didn&#8217;t work out of the box.</p>
 
 <p>Digging through the sourcecode I found this comment</p>
 
@@ -359,39 +253,15 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 
 
 <p>I know this is hacky as hell, but with this I was able to keep using this gem even inside pages with lots of moving parts.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/11/i-can-haz-js-template/">ICanHaz Templates - Dealing With the Lack of Dot Notation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-08-11T00:00:00-03:00" pubdate>Aug 11<span>th</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/11/i-can-haz-js-template/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>[UPDATE: 30/10/2011]</strong> According to <a href="https://github.com/janl/mustache.js/issues/97">this issue</a> we now have dot notation in moustache.js! Yay!</p>
+  <entry>
+    <title type="html"><![CDATA[ICanHaz templates - Dealing with the lack of dot notation]]></title>
+    <link href="http://act-as-newbie.com/blog/2011/08/11/i-can-haz-js-template/"/>
+    <updated>2011-08-11T00:00:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2011/08/11/i-can-haz-js-template</id>
+    <content type="html"><![CDATA[<p><strong>[UPDATE: 30/10/2011]</strong> According to <a href="https://github.com/janl/mustache.js/issues/97">this issue</a> we now have dot notation in moustache.js! Yay!</p>
 
 <p>The <a href="http://icanhazjs.com/">ICanHaz</a> javascript templating system is just awesome. It is really simple, and powerful, BUT as all good things in life it&#8217;s not perfect! ICanHaz is built on top of <a href="https://github.com/janl/mustache.js">moustache.js</a> that, on his part, is a javascript implementation of the moustache templates. Originally the moustache implementation didn&#8217;t support dot notation for accessing nested objects. Like for instance</p>
 
@@ -427,39 +297,15 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 
 
 <p>And that&#8217;ll do it. There&#8217;s an <a href="https://github.com/janl/mustache.js/issues/97">open issue</a> on the moustache.js github for the inclusion of the dot notation.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/03/recursive-partials/">Show Hierarchical Data Using Recursive Partials</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-08-03T00:00:00-03:00" pubdate>Aug 3<span>rd</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/03/recursive-partials/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday I needed to show a deep nested tree in a view. The first solution that crossed my mind was something along the lines of a recursive helper like this one.</p>
+  <entry>
+    <title type="html"><![CDATA[Show hierarchical data using recursive partials]]></title>
+    <link href="http://act-as-newbie.com/blog/2011/08/03/recursive-partials/"/>
+    <updated>2011-08-03T00:00:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2011/08/03/recursive-partials</id>
+    <content type="html"><![CDATA[<p>Yesterday I needed to show a deep nested tree in a view. The first solution that crossed my mind was something along the lines of a recursive helper like this one.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -545,108 +391,16 @@ The way it works is <code>upload_pass</code> routes the request to the <code>@ap
 
 
 <p>and that&#8217;s it!</p>
-</div>
+]]></content>
+  </entry>
   
+  <entry>
+    <title type="html"><![CDATA[Starting things up]]></title>
+    <link href="http://act-as-newbie.com/blog/2011/08/02/a-start/"/>
+    <updated>2011-08-02T00:00:00-03:00</updated>
+    <id>http://act-as-newbie.com/blog/2011/08/02/a-start</id>
+    <content type="html"><![CDATA[<p>Time to start sharing whatever knowledge comes my way! This will be the first post on this blog and I hope many will follow. I&#8217;ll mainly talk about Rails and its fellas, so if that&#8217;s your thing stick around!</p>
+]]></content>
+  </entry>
   
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/08/02/a-start/">Starting Things Up</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-  
-
-<time datetime="2011-08-02T00:00:00-03:00" pubdate>Aug 2<span>nd</span>, 2011</time>
-        
-         | <a href="/blog/2011/08/02/a-start/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Time to start sharing whatever knowledge comes my way! This will be the first post on this blog and I hope many will follow. I&#8217;ll mainly talk about Rails and its fellas, so if that&#8217;s your thing stick around!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    Liquid error: invalid byte sequence in US-ASCII
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - Rafael Barbosa -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'act-as-newbie';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-  <script type="text/javascript">
-    (function() {
-      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
-      script.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-    })();
-  </script>
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>
