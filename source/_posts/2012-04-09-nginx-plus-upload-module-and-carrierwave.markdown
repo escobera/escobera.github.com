@@ -7,6 +7,8 @@ published: true
 categories: [rails, nginx, carrierwave]
 ---
 
+**[UPDATE: 04/26/2012]** Nginx 1.2.0 stable has been released on 04/23/2012. All test this method on it and update all the links.
+
 Last night was a really long one. Why? Because I couldn't find enough information on how to make nginx handle uploads (using upload module and upload progress) and include carrierwave on the equation to handle files after they have been sent to the server.
 
 Maybe I didn't search enough, maybe I found only the old deprecated stuff, but after compiling [these](http://fernando.blat.es/post/11106552363/nginx-upload-module-rails-carrierwave) [sources](http://blog.joshsoftware.com/2010/10/20/uploading-multiple-files-with-nginx-upload-module-and-upload-progress-bar/) I think I came up with a decent solution.
@@ -16,14 +18,14 @@ First off, let's compile nginx with some upload sugar.
 {% codeblock lang:bash %}
 cd /tmp
 
-wget http://nginx.org/download/nginx-1.1.14.tar.gz
-tar -zxvf nginx-1.0.14.tar.gz
+wget http://nginx.org/download/nginx-1.1.15.tar.gz
+tar -zxvf nginx-1.1.15.tar.gz
 
 wget http://www.grid.net.ru/nginx/download/nginx_upload_module-2.2.0.tar.gz
 tar -zxvf nginx_upload_module-2.2.0.tar.gz
 
-cd nginx-1.0.14
-./configure --prefix=/usr/local/nginx-1.1.14 --with-http_ssl_module --with-http_gzip_static_module --conf-path=/etc/nginx/nginx.conf --add-module=../nginx_upload_module-2.2.0/
+cd nginx-1.1.15
+./configure --prefix=/usr/local/nginx-1.1.15 --with-http_ssl_module --with-http_gzip_static_module --conf-path=/etc/nginx/nginx.conf --add-module=../nginx_upload_module-2.2.0/
 make
 sudo make install
 {% endcodeblock %}
@@ -66,9 +68,9 @@ The way it works is `upload_pass` routes the request to the `@app` location afte
 
 Now restart nginx and you're good to go. #NOT
 
-As soon as you try to upload anything nginx will complain about permissions or directories it could not found so lets fix that.
+As soon as you try to upload anything nginx will complain about permissions or directories it could not found. Lets fix that.
 
-I'm using 1 level deep directory hashing (set on `upload store`) so I'll have to manually create the directory structure and chown it to the user that runs nginx workers (in my case is rafa:rafa).
+I'm using 1 level deep directory hashing (set on `upload_store`) so I'll have to manually create the directory structure and chown it to the user that runs nginx workers (in my case is rafa:rafa).
 
 {% codeblock %}
 cd /web_apps/mysite/shared/uploads/tmp

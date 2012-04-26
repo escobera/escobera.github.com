@@ -4,7 +4,7 @@ title: ICanHaz templates - Dealing with the lack of dot notation
 tags: [javascript, view]
 ---
 
-**[UPDATE: 30/10/2011]** According to [this issue](https://github.com/janl/mustache.js/issues/97) we now have dot notation in moustache.js! Yay!
+**[UPDATE: 10/30/2011]** According to [this issue](https://github.com/janl/mustache.js/issues/97) we now have dot notation in moustache.js! Yay!
 
 The [ICanHaz](http://icanhazjs.com/) javascript templating system is just awesome. It is really simple, and powerful, BUT as all good things in life it's not perfect! ICanHaz is built on top of [moustache.js](https://github.com/janl/mustache.js) that, on his part, is a javascript implementation of the moustache templates. Originally the moustache implementation didn't support dot notation for accessing nested objects. Like for instance
 
@@ -15,7 +15,7 @@ The [ICanHaz](http://icanhazjs.com/) javascript templating system is just awesom
       author : {
         name : "Rafael Barbosa",
         age : 26
-      } 
+      }
     };
 {% endcodeblock %}
 
@@ -23,13 +23,13 @@ Normally you can access the author's name in my js files via dot notation like <
 
 For the post object above, inside an ICanHaz template
 
-{% gist 1161362 %} 
+{% gist 1161362 %}
 
 And that'll do it. There's an [open issue](https://github.com/janl/mustache.js/issues/97) on the moustache.js github for the inclusion of the dot notation.
 
 
 
- 
+
 
 
 
